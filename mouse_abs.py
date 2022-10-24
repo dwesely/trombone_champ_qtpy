@@ -131,8 +131,8 @@ class Mouse:
         x = self._limit_coord(x)
         y = self._limit_coord(y)
         # HID reports use little endian
-        x1, x2 = (x & 0xFFFFFFFF).to_bytes(2, 'little')
-        y1, y2 = (y & 0xFFFFFFFF).to_bytes(2, 'little')
+        x1, x2 = (x & 0xFFFFFFF).to_bytes(2, 'little')
+        y1, y2 = (y & 0xFFFFFFF).to_bytes(2, 'little')
         #print(x1)
         #print(x2)
         #print(y1)

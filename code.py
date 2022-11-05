@@ -8,30 +8,6 @@ import analogio
 import digitalio
 import neopixel
 import rotaryio
-# from adafruit_hid.keyboard import Keyboard
-# from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
-# from adafruit_hid.keycode import Keycode
-
-# Helper to give us a nice color swirl (from Adafruit Trinket m0 demo)
-def wheel(pos):
-    # Input a value 0 to 255 to get a color value.
-    # The colours are a transition r - g - b - back to r.
-    color = (0, 0, 0)
-    if pos < 0:
-        return color
-    if pos > 255:
-        return color
-    if pos < 85:
-        color = (int(pos * 3), int(255 - (pos * 3)), 0)
-    elif pos < 170:
-        pos -= 85
-        color = (int(255 - pos * 3), 0, int(pos * 3))
-    else:
-        pos -= 170
-        color = (0, int(pos * 3), int(255 - pos * 3))
-    # print(color)
-    return(color)
-
 
 def scale_distance_to_mouse(dist, scaling_coefficient=0.5, inverted=False):
     max_mouse = 32767
@@ -77,6 +53,29 @@ mouse_inverted = digitalio.DigitalInOut(board.SDA)
 mouse_inverted.direction = digitalio.Direction.INPUT
 mouse_inverted.pull = digitalio.Pull.UP
 
+# set up neopixel (to indicate measurement precision)
+# Use the active/invert switch to select timing budget on boot
+pixel = neopixel.NeoPixel(board.NEOPIXEL, 1)
+
+def blink(count):
+    for i in range(0, count):
+        pixel.fill((255, 0, 0))
+        time.sleep(0.2)
+        pixel.fill((0, 0, 0))
+        time.sleep(0.2)
+
+if mouse_active.value and mouse_inverted.value:
+    vl53.measurement_timing_budget = 30000
+    blink(3)
+elif mouse_active.value:
+    vl53.measurement_timing_budget = 20000
+    blink(2)
+else:
+    vl53.measurement_timing_budget = 40000
+    blink(4)
+
+# done with neopixel
+del pixel
 
 # set up scale
 scale_reference_voltage = digitalio.DigitalInOut(board.A1)
@@ -85,14 +84,12 @@ scale_reference_voltage.value = True
 
 scale = analogio.AnalogIn(board.A0)
 
-# set up neopixel (for feedback to make sure things are moving)
-# pixel = neopixel.NeoPixel(board.NEOPIXEL, 1)
 
 tooting = False
 
 smoothed_position = 0
-last_mouse_position = 0
-last_last_mouse_position = 0
+# last_mouse_position = 0
+# last_last_mouse_position = 0
 
 # set up scroll wheel
 encoder = rotaryio.IncrementalEncoder(board.RX, board.SCK)
@@ -101,8 +98,7 @@ hat = digitalio.DigitalInOut(board.MISO)
 hat.direction = digitalio.Direction.INPUT
 hat.pull = digitalio.Pull.UP
 
-# kbd = Keyboard(usb_hid.devices)
-# if hat is clicked, send "enter" keystroke
+# TODO: if hat is clicked, send "enter" keystroke instead of mouse button
 
 # verbose = False
 
@@ -146,7 +142,6 @@ while True:
     #             print('hold still')
         mouse.release_all()
         last_wheel_position = position
-        # pixel.fill((0, 0, 0))
 
         if hat.value == True:
         #     if verbose:
@@ -193,5 +188,4 @@ while True:
     mouse.move(x=14000, y=smoothed_position, wheel=0)
     # last_last_mouse_position = last_mouse_position
     # last_mouse_position = smoothed_position
-    # pixel.fill(wheel(scale_distance_to_color(vl53.range, scaling_coefficient=scale_factor)))
     #break

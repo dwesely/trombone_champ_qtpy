@@ -54,5 +54,5 @@ absolute_mouse = usb_hid.Device(
     report_ids=(11,),
 )
 
-# usb_hid.enable((usb_hid.Device.KEYBOARD,), boot_device=1)
 usb_hid.enable((absolute_mouse,), boot_device=0)
+# usb_hid.enable((usb_hid.Device.KEYBOARD,), boot_device=1)

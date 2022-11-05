@@ -11,9 +11,22 @@ https://gist.github.com/bitboy85/cdcd0e7e04082db414b5f1d23ab09005
 """
 import time
 
-from . import find_device
-
-
+# https://github.com/adafruit/circuitpython/issues/5461
+def find_device(devices, *, usage_page, usage):
+    """Search through the provided list of devices to find the one with the matching usage_page and
+    usage."""
+    if hasattr(devices, "send_report"):
+        devices = [devices]
+    for device in devices:
+        if (
+            device.usage_page == usage_page
+            and device.usage == usage
+            and hasattr(device, "send_report")
+        ):
+            return device
+    raise ValueError("Could not find matching HID device.")
+	
+	
 class Mouse:
     """Send USB HID mouse reports."""
 
@@ -131,8 +144,8 @@ class Mouse:
         x = self._limit_coord(x)
         y = self._limit_coord(y)
         # HID reports use little endian
-        x1, x2 = (x & 0xFFFFFFF).to_bytes(2, 'little')
-        y1, y2 = (y & 0xFFFFFFF).to_bytes(2, 'little')
+        x1, x2 = (x & 0xFFFFFFFF).to_bytes(2, 'little')
+        y1, y2 = (y & 0xFFFFFFFF).to_bytes(2, 'little')
         #print(x1)
         #print(x2)
         #print(y1)
@@ -141,6 +154,7 @@ class Mouse:
         self.report[2] = x2
         self.report[3] = y1
         self.report[4] = y2
+        self.report[5] = 0
         self._mouse_device.send_report(self.report)
 
     def _send_no_move(self):
@@ -149,6 +163,7 @@ class Mouse:
         self.report[2] = 0
         self.report[3] = 0
         self.report[4] = 0
+        self.report[5] = 0
         self._mouse_device.send_report(self.report)
 
     @staticmethod

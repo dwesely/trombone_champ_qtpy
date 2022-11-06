@@ -63,7 +63,7 @@ def blink(count):
         time.sleep(0.2)
         pixel.fill((0, 0, 0))
         time.sleep(0.2)
-
+        
 if mouse_active.value and mouse_inverted.value:
     vl53.measurement_timing_budget = 30000
     blink(3)
@@ -100,7 +100,7 @@ hat.pull = digitalio.Pull.UP
 
 # TODO: if hat is clicked, send "enter" keystroke instead of mouse button
 
-# verbose = False
+# verbose = True
 
 while True:
     # if verbose:
@@ -109,8 +109,9 @@ while True:
     if toot.value:
     #     if verbose:
     #         print('toot')
-        mouse.press(Mouse.LEFT_BUTTON)
-        tooting  = True
+        if not tooting:
+            mouse.press(Mouse.LEFT_BUTTON)
+            tooting  = True
     elif tooting:
         mouse.release(Mouse.LEFT_BUTTON)
         tooting = False
@@ -171,14 +172,14 @@ while True:
     mouse_position = scale_distance_to_mouse(vl53.range, scaling_coefficient=scale_factor, inverted=mouse_inverted.value)
 
     # Smooth the position so it doesn't wobble too much
-    if abs(smoothed_position - mouse_position) > 3000:
+    if -2000 > (smoothed_position - mouse_position) > 2000:
         # There was a big jump, skip smooothing this time
         smoothed_position = mouse_position
         # last_last_mouse_position = mouse_position
         # last_mouse_position = mouse_position
     else:
         # Simple Average
-        smoothed_position = int((smoothed_position + mouse_position)/2)
+        smoothed_position = (smoothed_position + mouse_position)//2
 
         # kalman
         # first_term = mouse_position + 0.5*(last_mouse_position - mouse_position)

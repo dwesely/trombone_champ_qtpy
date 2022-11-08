@@ -46,8 +46,15 @@ On board RGB LED indicates which which timing budget is selected, so the measure
 
 JST connectors for input devices. 
 
+### Libraries used
+* adafruit_vl53l0x
+* adafruit_bus_device
+* neopixel
+* [mouse_abs](https://gist.github.com/bitboy85/cdcd0e7e04082db414b5f1d23ab09005)
+
 ### Parts list
 * QT PY RP2040 (Digikey: 1528-4900-ND)
+* Adafruit VL53L0X Time of Flight Distance Sensor (Digikey: 1528-1814-ND)
 * SN74AHC14N Schmitt Trigger (Digikey: 296-4550-5-ND)
 * ANT13SECQE 3-way switch SPDT, ON-OFF-ON (Digikey: 2449-ANT13SECQE-ND)
 * Momentary switch
@@ -64,6 +71,7 @@ JST connectors for input devices.
 ## Lessons learned
 * Rotary encoder pins must be sequential on the QT PY: https://github.com/adafruit/circuitpython/issues/5334
 * The toy gun worked very well as a case, there was fairly little modification
+* The mouse_abs library tended to scroll endlessly until I added "self.report[5] = 0" to the report functions.
 
 The following image is a Fritzing representation of the collapsed circuit. Using 7-pin female headers, the QT PY was raised above the Schmitt Trigger, which was mounted using a 14-pin DIP socket. The ceramic capacitors are not shown in this representation, but they fit beneath the Schmitt Trigger, inside the DIP socket. This is probably a terrible way to do it, but it worked enough for me, and it looked cool in the foam dart gun case.
 

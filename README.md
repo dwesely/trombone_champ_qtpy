@@ -1,3 +1,5 @@
+Moved into https://github.com/dwesely/trombone_champ, this branch is archived.
+
 # Controller for trombone champ game
 
 Control Trombone Champ by emulating a mouse with a QT-PY 2040 and VL53L0X distance sensor. This project was inspired by the [Adafruit Trombone Champ controller](https://learn.adafruit.com/circuitpython-trombone-champ-controller) by Liz Clark.
